@@ -1,0 +1,35 @@
+sensor:
+  - name: "sensor.kerui_demo-co2"
+    state_topic: "kerui_demo/co2/state"
+    unit_of_measurement: "ppm"
+    value_template: "{{ value_json.value }}"
+
+  - name: "sensor.kerui_demo-temperature"
+    state_topic: "kerui_demo/temperature/state"
+    unit_of_measurement: "°C"
+    value_template: "{{ value_json.value }}"
+
+  - name: "sensor.kerui_demo-humidity"
+    state_topic: "kerui_demo/humidity/state"
+    unit_of_measurement: "%"
+    value_template: "{{ value_json.value }}"
+
+  - name: "sensor.kerui_demo-luminosity"
+    state_topic: "kerui_demo/luminosity/state"
+    unit_of_measurement: ""
+    value_template: "{{ value_json.value }}"
+
+  - name: "sensor.kerui_demo-noise"
+    state_topic: "kerui_demo/noise/state"
+    unit_of_measurement: ""
+    value_template: "{{ value_json.value }}"
+
+  - name: "sensor.kerui_demo-pressure"
+    state_topic: "kerui_demo/pressure/state"
+    unit_of_measurement: ""
+    value_template: "{{ value_json.value }}"
+
+  - name: "sensor.kerui_demo-rssi"
+    state_topic: "kerui_demo/rssi/state"
+    unit_of_measurement: "dBm"
+    value_template: "{{ value_json.value }}"
