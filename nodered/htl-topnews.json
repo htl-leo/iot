@@ -1,0 +1,117 @@
+[
+    {
+        "id": "4a3d5455f96bac53",
+        "type": "tab",
+        "label": "HTL Top-News",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "df088507eb1f25be",
+        "type": "http request",
+        "z": "4a3d5455f96bac53",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://www.htl-leonding.at/",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 310,
+        "y": 60,
+        "wires": [
+            [
+                "296214c49c2bd411"
+            ]
+        ]
+    },
+    {
+        "id": "dcd48664ec0c12bb",
+        "type": "inject",
+        "z": "4a3d5455f96bac53",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 60,
+        "wires": [
+            [
+                "df088507eb1f25be"
+            ]
+        ]
+    },
+    {
+        "id": "296214c49c2bd411",
+        "type": "html",
+        "z": "4a3d5455f96bac53",
+        "name": "Htl Leonding",
+        "property": "payload",
+        "outproperty": "payload",
+        "tag": "h5",
+        "ret": "html",
+        "as": "single",
+        "x": 510,
+        "y": 60,
+        "wires": [
+            [
+                "8f7d64eb4dca817e"
+            ]
+        ]
+    },
+    {
+        "id": "07b19fdf4d4cf202",
+        "type": "debug",
+        "z": "4a3d5455f96bac53",
+        "name": "TopNews",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "8f7d64eb4dca817e",
+        "type": "function",
+        "z": "4a3d5455f96bac53",
+        "name": "Get TOP 5 News",
+        "func": "const newsArray = msg.payload\nmsg.payload = ''\nif(!newsArray || !newsArray[0]) return msg\nvar resultText = newsArray[0]\nfor (let i = 1; i < 5 && i < newsArray.length; i++){\n    resultText += '\\r\\n'\n    resultText += newsArray[i]\n}\nmsg.payload = resultText\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 250,
+        "y": 120,
+        "wires": [
+            [
+                "07b19fdf4d4cf202"
+            ]
+        ]
+    }
+]

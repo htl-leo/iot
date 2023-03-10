@@ -1,0 +1,483 @@
+[
+    {
+        "id": "e60a0af2cf35f360",
+        "type": "tab",
+        "label": "esp-demo",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "bf24c22cfa49dfcd",
+        "type": "inject",
+        "z": "e60a0af2cf35f360",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 80,
+        "wires": [
+            [
+                "e55ba75d28e92e38"
+            ]
+        ]
+    },
+    {
+        "id": "e55ba75d28e92e38",
+        "type": "api-current-state",
+        "z": "e60a0af2cf35f360",
+        "name": "temperature",
+        "server": "42f9b579.59a08c",
+        "version": 3,
+        "outputs": 1,
+        "halt_if": "",
+        "halt_if_type": "str",
+        "halt_if_compare": "is",
+        "entity_id": "sensor.esp00_temperature",
+        "state_type": "str",
+        "blockInputOverrides": false,
+        "outputProperties": [
+            {
+                "property": "data",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "entity"
+            },
+            {
+                "property": "temperature",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "entityState"
+            }
+        ],
+        "for": "0",
+        "forType": "num",
+        "forUnits": "minutes",
+        "override_topic": false,
+        "state_location": "payload",
+        "override_payload": "msg",
+        "entity_location": "data",
+        "override_data": "msg",
+        "x": 270,
+        "y": 80,
+        "wires": [
+            [
+                "f553b474c14ffb08"
+            ]
+        ]
+    },
+    {
+        "id": "9c7d1d5dced1a87e",
+        "type": "debug",
+        "z": "e60a0af2cf35f360",
+        "name": "Sensors",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "f553b474c14ffb08",
+        "type": "api-current-state",
+        "z": "e60a0af2cf35f360",
+        "name": "humidity",
+        "server": "42f9b579.59a08c",
+        "version": 3,
+        "outputs": 1,
+        "halt_if": "",
+        "halt_if_type": "str",
+        "halt_if_compare": "is",
+        "entity_id": "sensor.esp00_humidity",
+        "state_type": "str",
+        "blockInputOverrides": false,
+        "outputProperties": [
+            {
+                "property": "data",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "entity"
+            },
+            {
+                "property": "humidity",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "entityState"
+            }
+        ],
+        "for": "0",
+        "forType": "num",
+        "forUnits": "minutes",
+        "override_topic": false,
+        "state_location": "payload",
+        "override_payload": "msg",
+        "entity_location": "data",
+        "override_data": "msg",
+        "x": 440,
+        "y": 80,
+        "wires": [
+            [
+                "e0092b186e3913b8"
+            ]
+        ]
+    },
+    {
+        "id": "e0092b186e3913b8",
+        "type": "api-current-state",
+        "z": "e60a0af2cf35f360",
+        "name": "motion",
+        "server": "42f9b579.59a08c",
+        "version": 3,
+        "outputs": 1,
+        "halt_if": "",
+        "halt_if_type": "str",
+        "halt_if_compare": "is",
+        "entity_id": "binary_sensor.esp00_motion",
+        "state_type": "str",
+        "blockInputOverrides": false,
+        "outputProperties": [
+            {
+                "property": "data",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "entity"
+            },
+            {
+                "property": "motion",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "entityState"
+            }
+        ],
+        "for": "0",
+        "forType": "num",
+        "forUnits": "minutes",
+        "override_topic": false,
+        "state_location": "payload",
+        "override_payload": "msg",
+        "entity_location": "data",
+        "override_data": "msg",
+        "x": 590,
+        "y": 80,
+        "wires": [
+            [
+                "19ac637ba03b0f17"
+            ]
+        ]
+    },
+    {
+        "id": "5bd6c1282380f035",
+        "type": "function",
+        "z": "e60a0af2cf35f360",
+        "name": "check fan",
+        "func": "let fanOnTime = flow.get(\"fanOnTime\")\nlet isFanOn = flow.get(\"isFanOn\")\nif (msg.humidity >= msg.maxhumidity || msg.motion == 'on'){\n    fanOnTime = msg.fantimeextension\n}\nelse{\n    fanOnTime--\n}\nflow.set(\"fanOnTime\", fanOnTime)\nmsg.fanOnTime = fanOnTime\nnode.status(\n    { fill: \"green\", \n      shape: \"ring\", \n      text: `New fanOnTime: ${fanOnTime}` })\n//node.warn(`${msg.humidity}/${msg.motion}/${fanOnTime}`)\nif(fanOnTime < 0) fanOnTime = 0\nconst fanOnTimeMsg = { payload: fanOnTime}\nif (fanOnTime <= 0) {  // ausschalten\n    if (isFanOn){\n        flow.set(\"isFanOn\", false)\n    }\n    else{\n        msg = null\n    }\n    return [null, msg, fanOnTimeMsg]}\nelse {\n    if (!isFanOn) {\n        flow.set(\"isFanOn\", true)\n    }\n    else {\n        msg = null\n    }\n    return [msg, null, fanOnTimeMsg]\n}\n",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "// Der Code hier wird ausgeführt,\n// wenn der Node gestartet wird\nflow.set(\"fanOnTime\", 0)\nflow.set(\"isFanOn\", false)",
+        "finalize": "",
+        "libs": [],
+        "x": 160,
+        "y": 340,
+        "wires": [
+            [
+                "a35530b18c5100a6"
+            ],
+            [
+                "cf0f730c3e2aa9dc"
+            ],
+            [
+                "741aefe9fcbdb7bb"
+            ]
+        ]
+    },
+    {
+        "id": "cc427aa30d3dc0e1",
+        "type": "debug",
+        "z": "e60a0af2cf35f360",
+        "name": "Fan ON",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "e2e5736f9b0a5267",
+        "type": "debug",
+        "z": "e60a0af2cf35f360",
+        "name": "Fan OFF",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "a35530b18c5100a6",
+        "type": "api-call-service",
+        "z": "e60a0af2cf35f360",
+        "name": "Fan ON",
+        "server": "42f9b579.59a08c",
+        "version": 5,
+        "debugenabled": false,
+        "domain": "light",
+        "service": "turn_on",
+        "areaId": [],
+        "deviceId": [],
+        "entityId": [
+            "light.esp00_led"
+        ],
+        "data": "",
+        "dataType": "jsonata",
+        "mergeContext": "",
+        "mustacheAltTags": false,
+        "outputProperties": [],
+        "queue": "none",
+        "x": 360,
+        "y": 320,
+        "wires": [
+            [
+                "cc427aa30d3dc0e1"
+            ]
+        ]
+    },
+    {
+        "id": "cf0f730c3e2aa9dc",
+        "type": "api-call-service",
+        "z": "e60a0af2cf35f360",
+        "name": "Fan OFF",
+        "server": "42f9b579.59a08c",
+        "version": 5,
+        "debugenabled": false,
+        "domain": "light",
+        "service": "turn_off",
+        "areaId": [],
+        "deviceId": [],
+        "entityId": [
+            "light.esp00_led"
+        ],
+        "data": "",
+        "dataType": "jsonata",
+        "mergeContext": "",
+        "mustacheAltTags": false,
+        "outputProperties": [],
+        "queue": "none",
+        "x": 360,
+        "y": 360,
+        "wires": [
+            [
+                "e2e5736f9b0a5267"
+            ]
+        ]
+    },
+    {
+        "id": "19ac637ba03b0f17",
+        "type": "api-current-state",
+        "z": "e60a0af2cf35f360",
+        "name": "fantimeextension",
+        "server": "42f9b579.59a08c",
+        "version": 3,
+        "outputs": 1,
+        "halt_if": "",
+        "halt_if_type": "str",
+        "halt_if_compare": "is",
+        "entity_id": "input_number.fantimeextension",
+        "state_type": "str",
+        "blockInputOverrides": false,
+        "outputProperties": [
+            {
+                "property": "data",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "entity"
+            },
+            {
+                "property": "fantimeextension",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "entityState"
+            }
+        ],
+        "for": "0",
+        "forType": "num",
+        "forUnits": "minutes",
+        "override_topic": false,
+        "state_location": "payload",
+        "override_payload": "msg",
+        "entity_location": "data",
+        "override_data": "msg",
+        "x": 290,
+        "y": 140,
+        "wires": [
+            [
+                "241be122a736c589"
+            ]
+        ]
+    },
+    {
+        "id": "241be122a736c589",
+        "type": "api-current-state",
+        "z": "e60a0af2cf35f360",
+        "name": "maxhumidity",
+        "server": "42f9b579.59a08c",
+        "version": 3,
+        "outputs": 1,
+        "halt_if": "",
+        "halt_if_type": "str",
+        "halt_if_compare": "is",
+        "entity_id": "input_number.maxhumidity",
+        "state_type": "str",
+        "blockInputOverrides": false,
+        "outputProperties": [
+            {
+                "property": "data",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "entity"
+            },
+            {
+                "property": "maxhumidity",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "entityState"
+            }
+        ],
+        "for": "0",
+        "forType": "num",
+        "forUnits": "minutes",
+        "override_topic": false,
+        "state_location": "payload",
+        "override_payload": "msg",
+        "entity_location": "data",
+        "override_data": "msg",
+        "x": 490,
+        "y": 140,
+        "wires": [
+            [
+                "9c7d1d5dced1a87e",
+                "5bd6c1282380f035"
+            ]
+        ]
+    },
+    {
+        "id": "741aefe9fcbdb7bb",
+        "type": "ha-sensor",
+        "z": "e60a0af2cf35f360",
+        "name": "fanOnTime",
+        "entityConfig": "23f5de2f285ec8e3",
+        "version": 0,
+        "state": "payload",
+        "stateType": "msg",
+        "attributes": [],
+        "inputOverride": "allow",
+        "outputProperties": [],
+        "x": 370,
+        "y": 420,
+        "wires": [
+            [
+                "cf6f04ac993142d9"
+            ]
+        ]
+    },
+    {
+        "id": "cf6f04ac993142d9",
+        "type": "debug",
+        "z": "e60a0af2cf35f360",
+        "name": "FanOnTime",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "42f9b579.59a08c",
+        "type": "server",
+        "name": "Home Assistant",
+        "addon": true
+    },
+    {
+        "id": "23f5de2f285ec8e3",
+        "type": "ha-entity-config",
+        "server": "42f9b579.59a08c",
+        "deviceConfig": "33d4c06363c853c3",
+        "name": "fanontime",
+        "version": "6",
+        "entityType": "sensor",
+        "haConfig": [
+            {
+                "property": "name",
+                "value": "fanontime"
+            },
+            {
+                "property": "icon",
+                "value": ""
+            },
+            {
+                "property": "entity_category",
+                "value": "config"
+            },
+            {
+                "property": "device_class",
+                "value": "duration"
+            },
+            {
+                "property": "unit_of_measurement",
+                "value": "s"
+            },
+            {
+                "property": "state_class",
+                "value": "measurement"
+            }
+        ],
+        "resend": false,
+        "debugEnabled": false
+    },
+    {
+        "id": "33d4c06363c853c3",
+        "type": "ha-device-config",
+        "name": "fanontime",
+        "hwVersion": "",
+        "manufacturer": "Node-RED",
+        "model": "",
+        "swVersion": ""
+    }
+]
